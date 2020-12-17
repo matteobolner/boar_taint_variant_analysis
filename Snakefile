@@ -6,7 +6,11 @@ rule all:
         "data/stats/number_of_variants_in_v11.txt",
         "data/taint_vcf/taint_variants.vcf",
         "data/stats/taint_variants_stats.csv",
-        "data/stats/vcf_as_csv.csv"
+        "data/stats/vcf_as_csv.csv",
+        "data/taint_vcf/vcf_with_chr.vcf",
+        "data/vep/vep_input.tsv",
+        "data/vep/taint_variants_and_vep.csv"
+
 
 rule get_variant_number_v10:
     input:
@@ -59,3 +63,37 @@ rule vcf_stats:
         "data/stats/vcf_as_csv.csv"
     script:
         "scripts/vcf_stats.py"
+
+rule change_chr_field_vcf:
+    input:
+        "data/taint_vcf/taint_variants.vcf"
+    output:
+        "data/taint_vcf/vcf_with_chr_noheader.vcf"
+    script:
+        "scripts/change_chr_field_vcf.py"
+
+rule add_header_to_vcf:
+    input:
+        vcf = "data/taint_vcf/vcf_with_chr_noheader.vcf",
+        header = "data/starting_data/updated_header.txt"
+    output:
+        "data/taint_vcf/vcf_with_chr.vcf"
+    run:
+        shell("cat {input.header} {input.vcf} > {output}")
+
+rule prepare_vep_input:
+    input:
+        "data/taint_vcf/vcf_with_chr.vcf"
+    output:
+        "data/vep/vep_input.tsv"
+    run:
+        shell("grep -v '#' {input} | cut -f 1,2,3,4,5 > {output}")
+
+rule vep_and_analysis:
+    input:
+        "data/vep/vep_input.tsv",
+        "data/stats/taint_variants_stats.csv"
+    output:
+        "data/vep/taint_variants_and_vep.csv"
+    script:
+        "scripts/vep.py"
