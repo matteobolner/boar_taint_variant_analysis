@@ -1,11 +1,11 @@
 import pandas as pd
 import os
-#os.chdir('/home/pelmo/boar_taint_variant_analysis/scripts')
+#os.chdir('/home/pelmo/data_and_pipelines/boar_taint_variant_analysis/scripts')
 from functions import read_vcf
 from collections import Counter
 
 vcf_file =  snakemake.input[0]
-#vcf_file = '/home/pelmo/boar_taint_variant_analysis/data/taint_vcf/taint_variants.vcf'
+#vcf_file = '/home/pelmo//data_and_pipelines/boar_taint_variant_analysis/data/taint_vcf/taint_variants.vcf'
 
 df = read_vcf(vcf_file)
 
