@@ -8,8 +8,18 @@ rule all:
         "data/stats/taint_variants_stats.csv",
         "data/stats/vcf_as_csv.csv",
         "data/taint_vcf/vcf_with_chr.vcf",
-        "data/vep/vep_input.tsv",
-        "data/vep/taint_variants_and_vep.csv"
+        "data/vep/vep_output.tsv",
+        "data/vep/vep_output_comment_fixed.tsv",
+        "data/vep/vep_and_samples.csv"
+
+        #"data/vep/vep_output_comment_fixed.tsv",
+        #+"data/vep/vep_and_samples.csv"
+
+
+        #"data/vep/vep_output.tsv",
+        #"data/vep/vep_output_comment_fixed.tsv",
+        #'data/vep/vep_output_no_multiples.tsv'
+
 
 
 rule get_variant_number_v10:
@@ -89,11 +99,29 @@ rule prepare_vep_input:
     run:
         shell("grep -v '#' {input} | cut -f 1,2,3,4,5 > {output}")
 
-rule vep_and_analysis:
+rule vep_script:
     input:
-        "data/vep/vep_input.tsv",
+        "data/taint_vcf/vcf_with_chr.vcf"
+        #'data/vep/vep_input_no_multiples.tsv'
+    output:
+        #"data/vep/vep_output.tsv"
+        'data/vep/vep_output.tsv'
+    shell:
+         "/usr/bin/perl5.30.3 /home/pelmo/data_and_pipelines/boar_taint_variant_analysis/scripts/ensembl-vep/vep --appris --biotype --buffer_size 5000 --check_existing --distance 5000 --mane --protein --sift b --species sus_scrofa --symbol --transcript_version --tsl --uniprot --cache --input_file {input} --output_file {output}"
+
+rule change_comment_character:
+    input:
+        "data/vep/vep_output.tsv"
+    output:
+        "data/vep/vep_output_comment_fixed.tsv"
+    shell:
+        "sed 's/##/%/' {input} > {output}"
+
+rule merge_vep_samples:
+    input:
+        "data/vep/vep_output_comment_fixed.tsv",
         "data/stats/taint_variants_stats.csv"
     output:
-        "data/vep/taint_variants_and_vep.csv"
+        "data/vep/vep_and_samples.csv"
     script:
         "scripts/vep.py"
