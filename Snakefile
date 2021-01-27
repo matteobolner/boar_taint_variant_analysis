@@ -107,7 +107,7 @@ rule vep_script:
         #"data/vep/vep_output.tsv"
         'data/vep/vep_output.tsv'
     shell:
-         "/usr/bin/perl5.30.3 /home/pelmo/data_and_pipelines/boar_taint_variant_analysis/scripts/ensembl-vep/vep --appris --biotype --buffer_size 5000 --check_existing --distance 5000 --mane --protein --sift b --species sus_scrofa --symbol --transcript_version --tsl --uniprot --cache --input_file {input} --output_file {output}"
+         "/usr/bin/perl5.30.3 /home/pelmo/data_and_pipelines/boar_taint_variant_analysis/scripts/ensembl-vep/vep --appris --biotype --buffer_size 5000 --check_existing --distance 5000 --protein --sift b --species sus_scrofa --symbol --transcript_version --tsl --uniprot --cache --input_file {input} --output_file {output}"
 
 rule change_comment_character:
     input:
