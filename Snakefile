@@ -10,7 +10,11 @@ rule all:
         "data/taint_vcf/vcf_with_chr.vcf",
         "data/vep/vep_output.tsv",
         "data/vep/vep_output_comment_fixed.tsv",
-        "data/vep/vep_and_samples.csv"
+        "data/vep/vep_and_samples.csv",
+        "data/vep/consequences.png",
+        "data/vep/coding_consequences.png",
+        "data/vep/heatmap.png"
+
 
         #"data/vep/vep_output_comment_fixed.tsv",
         #+"data/vep/vep_and_samples.csv"
@@ -107,8 +111,9 @@ rule vep_script:
         #"data/vep/vep_output.tsv"
         'data/vep/vep_output.tsv'
     shell:
-         "/usr/bin/perl5.30.3 /home/pelmo/data_and_pipelines/boar_taint_variant_analysis/scripts/ensembl-vep/vep --appris --biotype --buffer_size 5000 --check_existing --distance 5000 --protein --sift b --species sus_scrofa --symbol --transcript_version --tsl --uniprot --cache --input_file {input} --output_file {output}"
-
+         #"/usr/bin/perl5.30.3 /home/pelmo/data_and_pipelines/boar_taint_variant_analysis/scripts/ensembl-vep/vep --appris --biotype --buffer_size 5000 --check_existing --distance 5000 --protein --sift b --species sus_scrofa --symbol --transcript_version --tsl --uniprot --cache --input_file {input} --output_file {output}"
+         #old command didnt pick one prediction per variant
+         "/usr/bin/perl5.30.3 /home/pelmo/data_and_pipelines/boar_taint_variant_analysis/scripts/ensembl-vep/vep --appris --biotype --buffer_size 5000 --check_existing --distance 5000 --domains --mane --pick --protein --sift b --species sus_scrofa --symbol --transcript_version --tsl --uniprot --cache --input_file {input} --output_file {output}"
 rule change_comment_character:
     input:
         "data/vep/vep_output.tsv"
@@ -125,3 +130,13 @@ rule merge_vep_samples:
         "data/vep/vep_and_samples.csv"
     script:
         "scripts/vep.py"
+        
+rule plot_vep_results:
+    input:
+        "data/vep/vep_and_samples.csv"
+    output:
+        "data/vep/consequences.png",
+        "data/vep/coding_consequences.png",
+        "data/vep/heatmap.png"
+    script:
+        "scripts/vep_stats.py"
