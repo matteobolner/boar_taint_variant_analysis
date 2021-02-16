@@ -34,7 +34,7 @@ rule report:
 
         {n_vars_11} variants were correctly remapped over {n_vars_10} input variants.
 
-        A summary of the VEP predicitions can be found at
+        A summary of the VEP predicitions can be found at https://github.com/matteobolner/boar_taint_variant_analysis/blob/main/results/vep/vep_output.tsv_summary.html
 
 
         """, output[0])
