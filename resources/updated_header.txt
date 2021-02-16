@@ -1,0 +1,35 @@
+##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+##samtoolsVersion=1.3+htslib-1.3
+##samtoolsCommand=samtools mpileup -u -m 3 -L 100 -f /tgac/scratch/chelonis/PIG_sequences_tmp/refGenome/samtools_faidx/ref_PIG_custom_fasta_cat.txt /tgac/scratch/chelonis/PIG_sequences_tmp/all/mrgd_bam_per_indvdl/AS01F01.merged.bam
+##ALT=<ID=*,Description="Represents allele(s) other than observed.">
+##INFO=<ID=INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=IDV,Number=1,Type=Integer,Description="Maximum number of reads supporting an indel">
+##INFO=<ID=IMF,Number=1,Type=Float,Description="Maximum fraction of reads supporting an indel">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw read depth">
+##INFO=<ID=VDB,Number=1,Type=Float,Description="Variant Distance Bias for filtering splice-site artefacts in RNA-seq data (bigger is better)",Version="3">
+##INFO=<ID=RPB,Number=1,Type=Float,Description="Mann-Whitney U test of Read Position Bias (bigger is better)">
+##INFO=<ID=MQB,Number=1,Type=Float,Description="Mann-Whitney U test of Mapping Quality Bias (bigger is better)">
+##INFO=<ID=BQB,Number=1,Type=Float,Description="Mann-Whitney U test of Base Quality Bias (bigger is better)">
+##INFO=<ID=MQSB,Number=1,Type=Float,Description="Mann-Whitney U test of Mapping Quality vs Strand Bias (bigger is better)">
+##INFO=<ID=SGB,Number=1,Type=Float,Description="Segregation based metric.">
+##INFO=<ID=MQ0F,Number=1,Type=Float,Description="Fraction of MQ0 reads (smaller is better)">
+##FORMAT=<ID=PL,Number=G,Type=Integer,Description="List of Phred-scaled genotype likelihoods">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##INFO=<ID=AF1,Number=1,Type=Float,Description="Max-likelihood estimate of the first ALT allele frequency (assuming HWE)">
+##INFO=<ID=AF2,Number=1,Type=Float,Description="Max-likelihood estimate of the first and second group ALT allele frequency (assuming HWE)">
+##INFO=<ID=AC1,Number=1,Type=Float,Description="Max-likelihood estimate of the first ALT allele count (no HWE assumption)">
+##INFO=<ID=MQ,Number=1,Type=Integer,Description="Root-mean-square mapping quality of covering reads">
+##INFO=<ID=FQ,Number=1,Type=Float,Description="Phred probability of all samples being the same">
+##INFO=<ID=PV4,Number=4,Type=Float,Description="P-values for strand bias, baseQ bias, mapQ bias and tail distance bias">
+##INFO=<ID=G3,Number=3,Type=Float,Description="ML estimate of genotype frequencies">
+##INFO=<ID=HWE,Number=1,Type=Float,Description="Chi^2 based HWE test P-value based on G3">
+##INFO=<ID=DP4,Number=4,Type=Integer,Description="Number of high-quality ref-forward , ref-reverse, alt-forward and alt-reverse bases">
+##bcftools_callVersion=1.2+htslib-1.2.1
+##bcftools_callCommand=call -v -O v -c --output /tgac/scratch/chelonis/PIG_sequences_tmp/all/vcf/AS01F01.raw.vcf
+##bcftools_filterVersion=1.2+htslib-1.2.1
+##bcftools_filterCommand=filter -i 'QUAL > 29.99 &&	(DP[0]+DP[1]+DP[2]+DP[3]<40) && (DP[2]+DP[3]>3)' -O v --output /tgac/scratch/chelonis/PIG_sequences_tmp/all/vcf/AS01F01.flt.vcf /tgac/scratch/chelonis/PIG_sequences_tmp/all/vcf/AS01F01.raw.vcf
+##bcftools_viewVersion=1.2+htslib-1.2.1
+##bcftools_viewCommand=view -O b -o /tgac/scratch/chelonis/PIG_sequences_tmp/all/vcf/AS01F01.flt.vcf.gz /tgac/scratch/chelonis/PIG_sequences_tmp/all/vcf/AS01F01.flt.vcf
+##bcftools_mergeVersion=1.2+htslib-1.2.1
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	AS01F01|angler_sattleschwein	AS01F09|angler_sattleschwein	BB01M47|bunte_bentheimer	BK01F10|berkshire	BK01M20|berkshire	BK1|berkshire	BK2|berkshire	BK3|berkshire	BS01F10|british_saddleback	BS01F35|british_saddleback	CA01F14|calabrese	CM01F17|chato_murciano	CM01F18|chato_murciano	CS01F02|cinta_senese	CT01F13|casertana	CT01M12|casertana	DU22M01|duroc	DU22M02|duroc	DU23M01|duroc	DU23M02|duroc	DU23M03|duroc	DU23M04|duroc	DU_Aahrus|duroc	DU_Hung|duroc	DU_WTSI|duroc	GO01F04|gloucester_old_spot	GO01F23|gloucester_old_spot	HA20U01|hampshire	HA20U02|hampshire	INDO22_Sumatra|wild_boar	INDO26_Sbarbatus|bearded_pig	INDO33_Sumatra|wild_boar	Jinhua_1|jinhua	Jinhua_2|jinhua	Jinhua_3|jinhua	LB01F49|large_black	LE01F25|leicoma	LR21M03|landrace	LR24F01|landrace	LR24F08|landrace	LR30F02|landrace	LR30F03|landrace	LR30F04|landrace	LS01F04|linderodsvin	LW22F01|large_white	LW22F02|large_white	LW22F03|large_white	LW22F04|large_white	LW22F06|large_white	LW22F07|large_white	LW22M04|large_white	LW22M07|large_white	LW36F01|large_white	LW36F02|large_white	LW36F03|large_white	LW36F04|large_white	LW36F05|large_white	LW36F06|large_white	LW37F01|large_white	LW38M02|large_white	MA01F18|mangalica	MA01F20|mangalica	Mangal_Blond|mangalica_blonde	Mangal_red|mangalica_red	Mangal_swallow_belly|mangalica_swallow_belly	MS20U10|meishan	MS20U11|meishan	MS21M07|meishan	MS21M14|meishan	MW01F29|middle_white	MW01F33|middle_white	Neijiang_1|neijiang	Neijiang_2|neijiang	Neijiang_3|neijiang	NI01U07|negro_iberico	NS01F05|nera_siciliana	OM001_Warthog|common_warthog	Penzhou_2|penzhou	Penzhou_3|penzhou	PI21F02|pietrain	PI21F06|pietrain	PI21M17|pietrain	PI21M20|pietrain	PI21M21|pietrain	Pietrain10|pietrain	Pietrain11|pietrain	Pietrain4|pietrain	Pietrain5|pietrain	RE01F51|retinto	SCEB01F01_Scebifrons|visayan_warty_pig	Sverrucosus|sus_verrucosus	TA01F19|tamworth	TA01M06|tamworth	WB21F05|wild_boar	WB21F10|wild_boar	WB21M03|wild_boar	WB22F01|wild_boar	WB22F02|wild_boar	WB25U11|wild_boar	WB28F31|wild_boar	WB28M39|wild_boar	WB42M09|wild_boar	WB44U06|wild_boar	WB44U07|wild_boar	Wujin_1|wujin	Wujin_2|wujin	Wujin_3|wujin	Yanan_1|yanan	Yanan_2|yanan	Yanan_3|yanan 

@@ -1,3 +1,7 @@
-/data
+breeds.csv
+Final_table.ods
+scripts/count_breeds.py
+
+
 scripts/__pycache__/
 .snakemake/

@@ -1,0 +1,157 @@
+rule all:
+    input:
+        "results/stats/vcf_as_csv.csv",
+        "results/vep/consequences.png",
+        "results/vep/coding_consequences.png",
+        "results/vep/heatmap.png",
+        "workflow/report/report.html"
+
+rule report:
+    input:
+        "results/stats/number_of_variants_in_v10.txt",
+        "results/stats/number_of_variants_in_v11.txt",
+        "results/stats/variants_in_v11.csv"
+    output:
+        "workflow/report/report.html"
+    run:
+        import pandas as pd
+        from snakemake.utils import report
+        with open(input[0]) as vars_v10:
+            n_vars_10 = vars_v10.readline().rstrip()
+        with open(input[1]) as vars_v11:
+            n_vars_11 = vars_v11.readline().rstrip()
+
+        genes = pd.read_csv(input[2])
+        genes_list = str(genes.iloc[:,1].unique().tolist())
+
+        report("""
+        Variant effect prediction
+        =============================================================================
+        After remapping a dataset of variant positions from the assembly version Sscrofa10.2  to Sscrofa11.1 using the https://github.com/matteobolner/sscrofa_variant_remapping pipeline,
+        the following genes were selected from the dataset of remapped variants:
+
+        {genes_list}
+
+        {n_vars_11} variants were correctly remapped over {n_vars_10} input variants.
+
+        A summary of the VEP predicitions can be found at
+
+
+        """, output[0])
+
+
+rule get_variant_number_v10:
+    input:
+        genes = "resources/taint_genes.txt",
+        coords = "resources/complete_coords_v10.csv"
+    output:
+        vars = "results/stats/variants_in_v10.csv",
+        vars_number ="results/stats/number_of_variants_in_v10.txt"
+    run:
+        shell("grep -f {input.genes} {input.coords} > {output.vars}")
+        shell("grep -f {input.genes} {input.coords} | wc -l > {output.vars_number}")
+
+rule get_variant_number_v11:
+    input:
+        genes = "resources/taint_genes.txt",
+        coords = "resources/remapped_and_verified_vars.csv"
+    output:
+        vars = "results/stats/variants_in_v11.csv",
+        vars_number ="results/stats/number_of_variants_in_v11.txt"
+    run:
+        shell("grep -f {input.genes} {input.coords} > {output.vars}")
+        shell("grep -f {input.genes} {input.coords} | wc -l > {output.vars_number}")
+
+rule taint_ensembl_ids:
+    input:
+        genes = "resources/taint_genes.txt",
+        coords = "results/stats/variants_in_v11.csv"
+    output:
+        ids = temp("resources/taint_ensembl_ids.csv")
+    run:
+        shell("cut -d ',' -f 5 {input.coords}  | sort -u > {output.ids}")
+
+
+rule variants_in_vcf_by_ensembl_id:
+    input:
+        ids = "resources/taint_ensembl_ids.csv",
+        vcf = "resources/vars_sscrofa11.vcf",
+        header = "resources/updated_header.txt"
+    output:
+        taint_vcf = "results/taint_vcf/taint_variants.vcf"
+    run:
+        shell("cat {input.header} > {output.taint_vcf}")
+        shell("grep -f {input.ids} {input.vcf} >> {output.taint_vcf}")
+
+rule vcf_stats:
+    input:
+        "results/taint_vcf/taint_variants.vcf"
+    output:
+        "results/stats/taint_variants_stats.csv",
+        "results/stats/vcf_as_csv.csv"
+    script:
+        "scripts/vcf_stats.py"
+
+rule change_chr_field_vcf:
+    input:
+        "results/taint_vcf/taint_variants.vcf"
+    output:
+        "results/taint_vcf/vcf_with_chr_noheader.vcf"
+    script:
+        "scripts/change_chr_field_vcf.py"
+
+rule add_header_to_vcf:
+    input:
+        vcf = "results/taint_vcf/vcf_with_chr_noheader.vcf",
+        header = "resources/updated_header.txt"
+    output:
+        "results/taint_vcf/vcf_with_chr.vcf"
+    run:
+        shell("cat {input.header} {input.vcf} > {output}")
+
+rule prepare_vep_input:
+    input:
+        "results/taint_vcf/vcf_with_chr.vcf"
+    output:
+        "results/vep/vep_input.tsv"
+    run:
+        shell("grep -v '#' {input} | cut -f 1,2,3,4,5 > {output}")
+
+rule run_vep_docker:
+    input:
+        "results/taint_vcf/vcf_with_chr.vcf"
+    output:
+        'results/vep/vep_output.tsv'
+    container:
+        "docker://ensemblorg/ensembl-vep"
+    shell:
+         #"/usr/bin/perl5.30.3 /home/pelmo/results_and_pipelines/boar_taint_variant_analysis/scripts/ensembl-vep/vep --appris --biotype --buffer_size 5000 --check_existing --distance 5000 --protein --sift b --species sus_scrofa --symbol --transcript_version --tsl --uniprot --cache --input_file {input} --output_file {output}"
+         #old command didnt pick one prediction per variant
+         "perl /opt/vep/src/ensembl-vep/vep --appris --biotype --buffer_size 5000 --check_existing --distance 5000 --domains --mane --pick --protein --sift b --species sus_scrofa --symbol --transcript_version --tsl --uniprot --database --input_file {input} --output_file {output}"
+
+rule change_comment_character_in_vep_output:
+    input:
+        "results/vep/vep_output.tsv"
+    output:
+        "results/vep/vep_output_comment_fixed.tsv"
+    shell:
+        "sed 's/##/%/' {input} > {output}"
+
+rule merge_vep_with_samples:
+    input:
+        "results/vep/vep_output_comment_fixed.tsv",
+        "results/stats/taint_variants_stats.csv"
+    output:
+        "results/vep/vep_and_samples.csv"
+    script:
+        "scripts/merge_vep_with_samples.py"
+
+rule plot_vep_results:
+    input:
+        "results/vep/vep_and_samples.csv"
+    output:
+        "results/vep/consequences.png",
+        "results/vep/coding_consequences.png",
+        "results/vep/heatmap.png"
+    script:
+        "scripts/vep_and_samples_stats.py"
