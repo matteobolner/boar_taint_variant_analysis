@@ -15,7 +15,7 @@ For the variant effect prediction, the official Ensembl VEP Docker container was
 ![alt text](https://raw.githubusercontent.com/matteobolner/boar_taint_variant_analysis/main/workflow/report/dag.svg)
 
 **Workflow report**  
-An HTML report of the pipeline is available in workflow/reports 
+An HTML report of the pipeline is available in workflow/reports  
 A summary of the VEP output is available at https://raw.githubusercontent.com/matteobolner/boar_taint_variant_analysis/main/results/vep/vep_output.tsv_summary.html
 
 
